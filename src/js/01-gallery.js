@@ -9,7 +9,6 @@ console.log(galleryItems);
 
 const gallery = document.querySelector('.gallery');
 const galleryList = createGaleryList(galleryItems);
-
 gallery.insertAdjacentHTML('beforeend', galleryList);
 
 function createGaleryList(galleryItems) {
@@ -30,8 +29,8 @@ function createGaleryList(galleryItems) {
     .join('');
 }
 
+
 const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 200,
-  enableKeyboard: true,
 });
