@@ -10,49 +10,39 @@ const refs = {
 };
 
 refs.form.addEventListener('submit', onFormSubmit);
-refs.form.addEventListener('input', throttle(onTextareaInput), 500);
-
-refs.form.addEventListener('input', evt => {
-    formData[evt.currentTarget.name] = evt.currentTarget.value;
-    console.log(formData) //об'єкт email and message
-})
+refs.textarea.addEventListener('input', throttle(messageSubmit), 500);
 
 onPopulateTextarea();
 
-//робота з текстовими полями (очищення після відправки форми) +++
+refs.form.addEventListener('input', evt => {
+    formData[evt.target.name] = evt.target.value;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  console.log(formData);
+})
+
+
 function onFormSubmit(evt) {
     evt.preventDefault();
-    evt.currentTarget.reset(); //очистити поля форми
-    localStorage.removeItem(STORAGE_KEY); //очистити локальні дані
+    evt.currentTarget.reset();
+    localStorage.removeItem(STORAGE_KEY);
 }
 
-//отримання даних з полів і запис у локал сторідж (одним рядком) +++
-function onTextareaInput(evt) {
-    // formData[evt.target.name] = evt.target.value;
-    const message = JSON.stringify(formData); //значення текстових полів (рядок)
-
-    localStorage.setItem(STORAGE_KEY, message); //додаєм текст з поля в локал сторідж
+function messageSubmit(evt) {
+    evt.preventDefault();
+  const message = evt.target.value
+  localStorage.setItem(STORAGE_KEY, message);
 }
 
-//занесення даних при перезавантаженні сторінки
+
 function onPopulateTextarea() {
   const savedMessage = localStorage.getItem(STORAGE_KEY);
-    // formData = JSON.parse(savedMessage);
+  const parsData = JSON.parse(savedMessage);
+  console.log(parsData)
+  savedMessage ? (refs.textarea.value = parsData.message) : '';
+  savedMessage ? (refs.input.value = parsData.email) : '';
 
-  if (savedMessage) {
-    formData = JSON.parse(savedMessage);
-  }
-  if (formData.email) {
-    refs.email.value = formData.email;
-  }
-  if (formData.message) {
-    refs.message.value = formData.message;
-  }
+    if (savedMessage) {
+      refs.textarea.value = parsData.message
+      refs.input.value = parsData.email
+    } 
 }
-
-
-// const json = '{"name":"Mango","age":3,"isHappy":true}';
-
-// const dog = JSON.parse(json);
-// console.log(dog); // {name: "Mango", age: 3, isHappy: true}
-// console.log(dog.name); // "Mango"
