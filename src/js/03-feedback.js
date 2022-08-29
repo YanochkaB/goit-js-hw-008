@@ -1,48 +1,42 @@
 import throttle from "lodash.throttle";
 
 const STORAGE_KEY = 'feedback-form-state';
-const formData = {};
 
-const refs = {
-    form: document.querySelector('.feedback-form'),
-    input: document.querySelector('input'),
-    textarea: document.querySelector('textarea'),
-};
+const formEl = document.querySelector('.feedback-form');
 
-refs.form.addEventListener('submit', onFormSubmit);
-refs.textarea.addEventListener('input', throttle(messageSubmit), 500);
+formEl.addEventListener('input', throttle(messageSubmit), 500);
+formEl.addEventListener('submit', onFormSubmit);
 
-onPopulateTextarea();
-
-refs.form.addEventListener('input', evt => {
-    formData[evt.target.name] = evt.target.value;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-  console.log(formData);
-})
-
+onPopulateTextarea(formEl);
 
 function onFormSubmit(evt) {
-    evt.preventDefault();
-    evt.currentTarget.reset();
-    localStorage.removeItem(STORAGE_KEY);
+  evt.preventDefault();
+  
+  const formFields = {
+    email: evt.currentTarget.email.value,
+    message: evt.currentTarget.message.value,
+  }
+  console.log(formFields)
+
+  evt.currentTarget.reset();
+  localStorage.removeItem(STORAGE_KEY);
 }
 
 function messageSubmit(evt) {
-    evt.preventDefault();
-  const message = evt.target.value
-  localStorage.setItem(STORAGE_KEY, message);
+  const formText = evt.target.closest('form')
+  const formState = {
+    email: formText.email.value,
+    message: formText.message.value,
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(formState));
 }
 
 
-function onPopulateTextarea() {
-  const savedMessage = localStorage.getItem(STORAGE_KEY);
-  const parsData = JSON.parse(savedMessage);
-  console.log(parsData)
-  savedMessage ? (refs.textarea.value = parsData.message) : '';
-  savedMessage ? (refs.input.value = parsData.email) : '';
-
-    if (savedMessage) {
-      refs.textarea.value = parsData.message
-      refs.input.value = parsData.email
-    } 
+function onPopulateTextarea(formText) {
+  const localStText = localStorage.getItem(STORAGE_KEY)
+  
+  if (!localStText) return;
+  const { email, message } = JSON.parse(localStText);
+  formText.email.value = email;
+  formText.message.value = message;
 }
