@@ -5,18 +5,19 @@ const formData = {};
 
 const refs = {
     form: document.querySelector('.feedback-form'),
-    textarea: document.querySelector('.feedback-form textarea'),
+    input: document.querySelector('input'),
+    textarea: document.querySelector('textarea'),
 };
 
 refs.form.addEventListener('submit', onFormSubmit);
-refs.textarea.addEventListener('input', throttle(onTextareaInput), 500);
+refs.form.addEventListener('input', throttle(onTextareaInput), 500);
 
 refs.form.addEventListener('input', evt => {
     formData[evt.currentTarget.name] = evt.currentTarget.value;
     console.log(formData) //об'єкт email and message
 })
 
-populateTextarea();
+onPopulateTextarea();
 
 //робота з текстовими полями (очищення після відправки форми) +++
 function onFormSubmit(evt) {
@@ -27,22 +28,26 @@ function onFormSubmit(evt) {
 
 //отримання даних з полів і запис у локал сторідж (одним рядком) +++
 function onTextareaInput(evt) {
+    // formData[evt.target.name] = evt.target.value;
     const message = JSON.stringify(formData); //значення текстових полів (рядок)
 
     localStorage.setItem(STORAGE_KEY, message); //додаєм текст з поля в локал сторідж
 }
 
 //занесення даних при перезавантаженні сторінки
-function populateTextarea() {
-    const savedMessage = localStorage.getItem(STORAGE_KEY);
+function onPopulateTextarea() {
+  const savedMessage = localStorage.getItem(STORAGE_KEY);
+    // formData = JSON.parse(savedMessage);
 
-    savedMessage ? refs.textarea.value = savedMessage : '';
-    
-    // if (savedMessage) {
-    //     // refs.textarea = refs.textarea.value;
-    // } else {
-    //     ''
-    // }
+  if (savedMessage) {
+    formData = JSON.parse(savedMessage);
+  }
+  if (formData.email) {
+    refs.email.value = formData.email;
+  }
+  if (formData.message) {
+    refs.message.value = formData.message;
+  }
 }
 
 
